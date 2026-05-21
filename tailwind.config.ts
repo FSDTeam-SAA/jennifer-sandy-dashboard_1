@@ -62,8 +62,8 @@ const config: Config = {
   			}
   		},
 		fontFamily: {
-  			poppins: [
-  				'var(--font-poppins)'
+  			manrope: [
+  				'var(--font-manrope)'
   			]
   		},
   		// fontFamily: {

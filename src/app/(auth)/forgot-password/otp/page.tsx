@@ -2,7 +2,7 @@ import Image from 'next/image'
 import React, { Suspense } from 'react'
 import OtpForm from './_components/otp-form'
 
-import authImage  from "../../../../../public/assets/images/auth-new-img.jpeg"
+import authImage  from "../../../../../public/assets/images/auth_img.png"
 const OtpPage = () => {
   return (
     <div className='w-full min-h-screen grid grid-cols-1 md:grid-cols-2'>
