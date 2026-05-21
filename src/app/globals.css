@@ -8,37 +8,35 @@
   }
 }
 
-/* new code  */
-
 @layer base {
   :root {
-    /* Primary Base (#10e607) */
-    --primary: 118 94% 46%;
+    /* Primary Base (#0678EF) */
+    --primary: 211 95% 48%;
     --primary-foreground: 0 0% 100%;
 
     /* Primary Shades */
-    --primary-light: 118 94% 60%;
-    --primary-lighter: 118 94% 70%;
-    --primary-dark: 118 94% 36%;
-    --primary-darker: 118 94% 26%;
+    --primary-light: 211 95% 58%;
+    --primary-lighter: 211 95% 68%;
+    --primary-dark: 211 95% 38%;
+    --primary-darker: 211 95% 28%;
 
     /* Hover & Ring */
-    --primary-hover: 118 94% 40%;
-    --ring: 118 94% 46%;
+    --primary-hover: 211 95% 42%;
+    --ring: 211 95% 48%;
   }
 
   .dark {
-    /* Primary Base same but adjusted for dark UI */
-    --primary: 118 94% 50%;
-    --primary-foreground: 0 0% 0%;
+    /* Primary Base adjusted for dark UI */
+    --primary: 211 95% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --primary-light: 118 94% 60%;
-    --primary-lighter: 118 94% 70%;
-    --primary-dark: 118 94% 40%;
-    --primary-darker: 118 94% 30%;
+    --primary-light: 211 95% 65%;
+    --primary-lighter: 211 95% 75%;
+    --primary-dark: 211 95% 45%;
+    --primary-darker: 211 95% 35%;
 
-    --primary-hover: 118 94% 55%;
-    --ring: 118 94% 55%;
+    --primary-hover: 211 95% 60%;
+    --ring: 211 95% 55%;
   }
 }
 

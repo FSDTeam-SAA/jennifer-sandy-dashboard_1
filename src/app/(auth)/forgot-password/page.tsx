@@ -2,7 +2,7 @@ import Image from 'next/image'
 import React from 'react'
 import ForgotPasswordForm from './_components/forgot-password-form'
 
-import authImage  from "../../../../public/assets/images/auth-new-img.jpeg"
+import authImage  from "../../../../public/assets/images/auth_img.png"
 const ForgotPasswordPage = () => {
   return (
     <div className='w-full min-h-screen grid grid-cols-1 md:grid-cols-2'>

@@ -2,7 +2,7 @@ import Image from 'next/image'
 import React, { Suspense } from 'react'
 import ResetPasswordForm from './_components/reset-password-form'
 
-import authImage  from "../../../../../../public/assets/images/auth-new-img.jpeg"
+import authImage  from "../../../../../../public/assets/images/auth_img.png"
 const ResetPasswordPage = () => {
   return (
     <div className='w-full min-h-screen grid grid-cols-1 md:grid-cols-2'>

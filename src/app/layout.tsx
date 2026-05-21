@@ -4,19 +4,12 @@ import { Toaster } from "@/components/ui/sonner";
 import AuthProvider from "@/components/providers/AuthProvider";
 import AppProvider from "@/components/providers/AppProvider";
 
-import { Poppins } from "next/font/google";
+import { Manrope } from "next/font/google";
 
-const poppins = Poppins({
+const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
 });
-
-// import localFont from "next/font/local";
-// const daggerSquare = localFont({
-//   src: "./fonts/DAGGERSQUARE.otf",
-//   variable: "--font-dagger-square",
-//   display: "swap",
-// });
 
 export const metadata: Metadata = {
   title: "Analytic Soccer",
@@ -25,8 +18,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={poppins.className}>
-      <body className={`font-poppins antialiased`}>
+    <html lang="en" className={manrope.className}>
+      <body className={`font-manrope antialiased`}>
         <AuthProvider>
           <AppProvider>
 
