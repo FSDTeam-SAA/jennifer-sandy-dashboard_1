@@ -12,9 +12,7 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-
-import logo from "../../../../../../public/assets/images/logo.jpg"
+import { Button } from "@/components/ui/button";
 
 export default function OtpForm() {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
@@ -150,22 +148,25 @@ export default function OtpForm() {
   };
 
   return (
-    <div className="">
-      <div className="w-full md:w-[570px] bg-white rounded-[16px] border-[2px] border-[#E7E7E7] shadow-[0px_0px_32px_0px_#0000001F] p-8">
-        <div className="w-full flex items-center justify-center pb-4">
-          <Link href="/">
-          <Image src={logo} alt="auth logo" width={500} height={500} className="w-[290px] h-[110px] object-cover" />
-          </Link>
-        </div>
+    <div className="w-full max-w-[496px] px-4">
+      <div className="absolute top-8 right-8 hidden md:block">
+        <Link href="/" className="text-sm text-gray-500 font-medium transition-colors hover:text-primary hover:underline">
+          Back to Dashboard
+        </Link>
+      </div>
 
-        <h3 className="text-2xl md:text-[32px] lg:text-[40px] font-normal text-[#131313] text-center leading-[120%] ">
-          Enter OTP
+      <div className="mb-8">
+        <h3 className="text-3xl md:text-[36px] font-bold text-primary mb-2">
+          Verify Email
         </h3>
-        <p className="text-basefont-normal text-[#616161] leading-[150%] text-center pt-2 pb-6">
-          Please enter the email address linked to your <br/> account. We&apos;ll send a one-time password (OTP) to <br/> your email for verification.
+        <p className="text-sm md:text-base text-gray-500">
+          Enter OTP to verify your email address
         </p>
+      </div>
+
+      <div className="space-y-6">
         {/* OTP Input Fields */}
-        <div className="flex gap-[10px] md:gap-5 lg:gap-6 w-full justify-center">
+        <div className="flex gap-2 md:gap-4 w-full justify-start">
           {otp.map((digit, index) => (
             <Input
               key={index}
@@ -179,36 +180,58 @@ export default function OtpForm() {
               ref={(el) => {
                 inputRefs.current[index] = el;
               }}
-              className={` w-[54px] md:w-[60px] lg:w-[54px] h-[56px] md:h-[60px] lg:h-[64px] bg-white text-[#212121] placeholder:text-[#999999] text-center tracking-[0%] !text-xl font-semibold leading-[120%] rounded-md focus:outline-none border ${digit ? "border-[#212121]" : "border-black"
-                }`}
+              className={`w-[48px] h-[48px] md:w-[56px] md:h-[56px] bg-white text-center text-lg font-semibold rounded-[8px] focus:outline-none focus:ring-0 transition-all ${
+                digit 
+                  ? "border-primary text-primary" 
+                  : "border-gray-300 text-black focus:border-primary"
+              }`}
               aria-label={`OTP digit ${index + 1}`}
             />
           ))}
         </div>
 
-        {/* Resend OTP */}
-        <div className="text-center flex items-center justify-between pt-5 lg:pt-6 pb-5 lg:pb-6">
-          <span className=" text-base font-normal leading-[120%] text-black tracking-[0%]">
-            Didn&apos;t Receive OTP?{" "}
-          </span>
-          <button
-            onClick={handleResendOtp}
-            disabled={resentOtpPending}
-            className=" text-base font-normal leading-[120%] text-black tracking-[0%] hover:underline"
-          >
-            {resentOtpPending ? "Resending..." : "RESEND OTP"}
-          </button>
+        {/* Timer and Resend OTP */}
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center text-gray-500 gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span>00:59</span>
+          </div>
+          <div className="text-gray-600">
+            Didn&apos;t get a code?{" "}
+            <button
+              onClick={handleResendOtp}
+              disabled={resentOtpPending}
+              className="font-medium text-primary hover:underline"
+            >
+              {resentOtpPending ? "Resending..." : "Resend"}
+            </button>
+          </div>
         </div>
 
         {/* Verify Button */}
-        <button
+        <Button
           onClick={handleVerify}
-          type="submit"
-          className="w-full h-[52px] bg-primary rounded-[8px] py-[15px] px-[151px] text-lg font-semibold  leading-[120%] tracking-[0%] text-[#F4F4F4]"
+          type="button"
           disabled={isPending}
+          className={`text-base font-medium text-white cursor-pointer leading-[120%] rounded-[8px] py-4 w-full h-[51px] transition-opacity ${
+            isPending ? "opacity-50 cursor-not-allowed" : "bg-primary hover:bg-primary/90"
+          }`}
         >
           {isPending ? "Verifying..." : "Verify"}
-        </button>
+        </Button>
       </div>
     </div>
   );

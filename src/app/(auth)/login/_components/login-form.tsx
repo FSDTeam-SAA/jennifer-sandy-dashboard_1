@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import Image from 'next/image'
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,8 +22,6 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 // import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-
-import logo from "../../../../../public/assets/images/logo.jpg"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -97,169 +94,127 @@ const LoginForm = () => {
     }
   }
 
-  // 2. Define a submit handler.
-  // async function onSubmit(values: z.infer<typeof formSchema>) {
-  //   try {
-  //     setIsLoading(true);
-
-  //     const res = await signIn("credentials", {
-  //       email: values?.email,
-  //       password: values?.password,
-  //       redirect: false,
-  //     });
-
-  //     if (!res) {
-  //       toast.error("No response from server");
-  //       return;
-  //     }
-
-  //     // if (res?.error) {
-  //     //   throw new Error(res.error);
-  //     // }
-
-  //      if (res?.error) {
-  //     if (res.error === "ADMIN_ONLY") {
-  //       toast.error("Only admin can access this admin dashboard");
-  //       return;
-  //     }
-
-  //     if (res.error === "INVALID_CREDENTIALS") {
-  //       toast.error("Email or Password wrong");
-  //       return;
-  //     }
-
-  //     toast.error("Login failed");
-  //     return;
-  //   }
-  //     toast.success("Login successful!");
-  //     router.push("/");
-  //   } catch (error) {
-  //     console.error("Login failed:", error);
-  //     toast.error("Login failed. Please try again.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
-
 
   return (
-    <div>
-      <div className="w-full md:w-[570px] bg-white rounded-[16px] border-[2px] border-[#E7E7E7] shadow-[0px_0px_32px_0px_#0000001F] p-8">
-        <div className="w-full flex items-center justify-center pb-4">
-          <Link href="/">
-            <Image src={logo} alt="auth logo" width={500} height={500} className="w-[290px] h-[110px] object-cover" />
-          </Link>
-        </div>
+    <div className="w-full max-w-[496px] px-4">
+      <div className="absolute top-8 right-8 hidden md:block">
+        <Link href="/" className="text-sm text-gray-500 font-medium transition-colors hover:text-primary hover:underline">
+          Back to Dashboard
+        </Link>
+      </div>
 
-        <h3 className="text-2xl md:text-[32px] lg:text-[40px] font-normal text-[#131313] text-center leading-[120%] ">
-          Welcome Back!
+      <div className="mb-8">
+        <h3 className="text-3xl md:text-[36px] font-bold text-primary mb-2">
+          Welcome
         </h3>
-        {/* <p className="text-basefont-normal text-[#616161] leading-[150%] text-center pt-2">
-          Enter to get unlimited data & information
-        </p> */}
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 pt-5 md:pt- lg:pt-8"
-          >
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-base font-medium leading-[150%] text-[#424242]">
-                    Email <sup className="text-[#8C311E]">*</sup>
-                  </FormLabel>
-                  <FormControl>
+        <p className="text-sm md:text-base text-gray-500">
+          Access your account to manage tours, leads, and listings
+        </p>
+      </div>
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-5"
+        >
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">
+                  Email Address
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="w-full h-[48px] text-base font-medium leading-[120%] text-black rounded-[8px] outline-none p-4 border border-gray-300 placeholder:text-gray-400 focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                    placeholder="hello@example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">
+                  Password
+                </FormLabel>
+                <FormControl>
+                  <div className="relative">
                     <Input
-                      className="w-full h-[48px] text-base font-medium leading-[120%] text-black rounded-[8px] outline-none p-4 border border-[#6C6C6C] placeholder:text-[#929292]"
-                      placeholder="Enter your email address..."
+                      type={showPassword ? "text" : "password"}
+                      className="w-full h-[48px] text-base font-medium leading-[120%] text-black rounded-[8px] outline-none p-4 border border-gray-300 placeholder:text-gray-400 focus:border-primary focus:ring-1 focus:ring-primary transition-all pr-12"
+                      placeholder="********"
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-base font-medium leading-[150%] text-[#424242]">
-                    Password <sup className="text-[#8C311E]">*</sup>
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        className="w-full h-[48px] text-base font-medium leading-[120%] text-black rounded-[8px] outline-none p-4 border border-[#6C6C6C] placeholder:text-[#929292]"
-                        placeholder="Enter password..."
-                        {...field}
-                      />
-                      <button
-                        type="button"
-                        className="absolute top-3.5 right-4"
-                      >
-                        {showPassword ? (
-                          <Eye onClick={() => setShowPassword(!showPassword)} />
-                        ) : (
-                          <EyeOff
-                            onClick={() => setShowPassword(!showPassword)}
-                          />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="rememberMe"
-              render={({ field }) => (
-                <div className="w-full flex items-center justify-between">
-                  <FormItem className="flex items-center gap-[10px]">
-                    <FormControl className="mt-1">
-                      <Checkbox
-                        id="rememberMe"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="data-[state=checked]:bg-primary data-[state=checked]:text-white border-primary"
-                      />
-                    </FormControl>
-                    <Label
-                      className="text-sm font-medium text-[#2A2A2A] leading-[120%]"
-                      htmlFor="rememberMe"
+                    <button
+                      type="button"
+                      className="absolute top-1/2 -translate-y-1/2 right-4 text-gray-400 hover:text-gray-600"
                     >
-                      Remember Me
-                    </Label>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                  <Link
-                    className="text-sm font-medium text-[#8C311ECC]/80 cursor-pointer leading-[120%] hover:underline"
-                    href="/forgot-password"
+                      {showPassword ? (
+                        <Eye size={20} onClick={() => setShowPassword(!showPassword)} />
+                      ) : (
+                        <EyeOff
+                          size={20}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      )}
+                    </button>
+                  </div>
+                </FormControl>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="rememberMe"
+            render={({ field }) => (
+              <div className="w-full flex items-center justify-between pt-1">
+                <FormItem className="flex items-center gap-[8px] space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      id="rememberMe"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="data-[state=checked]:bg-primary data-[state=checked]:text-white border-gray-300 rounded-[4px]"
+                    />
+                  </FormControl>
+                  <Label
+                    className="text-sm font-normal text-gray-600 cursor-pointer"
+                    htmlFor="rememberMe"
                   >
-                    Forgot Password?
-                  </Link>
-                </div>
-              )}
-            />
-            <div className="pt-2">
-              <Button
-                disabled={isLoading}
-                className={`text-base font-medium text-white cursor-pointer leading-[120%] rounded-[8px] py-4 w-full h-[51px] ${isLoading ? "opacity-50 cursor-not-allowed" : "bg-primary"
-                  }`}
-                type="submit"
-              >
-                {isLoading ? "Sign In ..." : "Sign In"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </div>
+                    Remember me
+                  </Label>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+                <Link
+                  className="text-sm font-medium text-primary hover:underline"
+                  href="/forgot-password"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+            )}
+          />
+          <div className="pt-4">
+            <Button
+              disabled={isLoading}
+              className={`text-base font-medium text-white cursor-pointer leading-[120%] rounded-[8px] py-4 w-full h-[51px] transition-opacity ${isLoading ? "opacity-50 cursor-not-allowed" : "bg-primary hover:bg-primary/90"
+                }`}
+              type="submit"
+            >
+              {isLoading ? "Logging in..." : "Log In"}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 };
