@@ -1,0 +1,64 @@
+export interface GkStatsPlayer {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  profileImage: string;
+  verified: boolean;
+  socialMedia: string[];
+  playingVideo: string[];
+  isSubscription: boolean;
+  subscription: string;
+  accessLavel: string[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  lastLogin: string;
+  subscriptionExpiry: string;
+  agent: string;
+  birthdayPlace: string;
+  category: string;
+  citizenship: string;
+  currentClub: string;
+  dob: string;
+  foot: string;
+  gender: string;
+  hight: string;
+  inSchoolOrCollege: boolean;
+  league: string;
+  phone: string;
+  weight: string;
+  position: string[];
+  teamName: string;
+  gpa: string;
+  institute: string;
+  provider: string;
+}
+
+export interface GkStatsData {
+  _id: string;
+  player: GkStatsPlayer;
+  goalsConceded: number;
+  penaltKitkSave: number; // Probably should be penaltyKickSave? Keep as is for consistency
+  saves: number;
+  aerialControl: number;
+  catches: number;
+  deFensiveLineSupport: number;
+  parries: number;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+export interface GkStatsApiResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data: GkStatsData[];
+}
