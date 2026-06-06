@@ -66,7 +66,7 @@ export function DashboardSidebar() {
   const pathName = usePathname();
 
   return (
-    <Sidebar className="border-none w-[280px]">
+    <Sidebar className="border-none w-[312px]">
       <SidebarContent className="bg-[#ECECEC] scrollbar-hide border-r border-[#D9D9D9]">
         <SidebarGroup className="p-0">
           <div className="flex flex-col justify-between min-h-screen pb-6">
