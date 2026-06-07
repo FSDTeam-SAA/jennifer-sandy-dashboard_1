@@ -14,31 +14,32 @@ import ClaudePagination from "@/components/ui/claude-pagination";
 import { Trash, Eye } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import moment from "moment";
 import TableSkeletonWrapper from "@/components/shared/TableSkeletonWrapper/TableSkeletonWrapper";
 import ErrorContainer from "@/components/shared/ErrorContainer/ErrorContainer";
 import NotFound from "@/components/shared/NotFound/NotFound";
 import { toast } from "sonner";
-import { AllUserApiResponse, User } from "./user-management-data-type";
-import UserManagementView from "./user-management-view";
+import InquiriesManagementView from "./inquiries-management-view";
+import {
+  Inquiry,
+  AllInquiryApiResponse,
+} from "./inquiries-management-data-type";
+import moment from "moment";
 
-const UserManagementContainer = () => {
+const InquiriesManagementContainer = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectViewContact, setSelectViewContact] = useState(false);
   const session = useSession();
   const token = (session?.data?.user as { accessToken: string })?.accessToken;
-  const [selectedContact, setSelectedContact] = useState<User | null>(
-    null,
-  );
+  const [selectedContact, setSelectedContact] = useState<Inquiry | null>(null);
   const [selectedContactId, setSelectedContactId] = useState("");
   const queryClient = useQueryClient();
 
-  const { data, isLoading, error, isError } = useQuery<AllUserApiResponse>({
-    queryKey: ["user-management", currentPage],
+  const { data, isLoading, error, isError } = useQuery<AllInquiryApiResponse>({
+    queryKey: ["inquiry-management", currentPage],
     queryFn: async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/user?page=${currentPage}&limit=8`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/inquiry?page=${currentPage}&limit=8`,
         {
           method: "GET",
           headers: {
@@ -78,18 +79,28 @@ const UserManagementContainer = () => {
   } else if (data && data?.data && data?.data?.length > 0) {
     content = (
       <Table className="">
-        <TableHeader className="bg-[#E6F2FD] !rounded-t-[12px]">
+        <TableHeader className="bg-[#E6F2FD] rounded-t-[12px]">
           <TableRow className="">
             <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] py-4 pl-6">
+              Inquiry ID
+            </TableHead>
+            <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4 ">
               Name
             </TableHead>
             <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4 ">
               Email
             </TableHead>
             <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4 ">
-              Joined
+              Property
             </TableHead>
-            <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4 ">
+            <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4">
+              Message
+            </TableHead>
+
+            <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4">
+              Date
+            </TableHead>
+            <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4">
               Status
             </TableHead>
             <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4">
@@ -97,18 +108,30 @@ const UserManagementContainer = () => {
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="border-b border-x border-[#E6E7E6] !rounded-b-[12px]">
+        <TableBody className="border-b border-x border-[#E6E7E6] rounded-b-[12px]">
           {data?.data?.map((item, index) => {
             return (
               <TableRow key={index} className="">
                 <TableCell className="text-base font-medium text-[#68706A] leading-[150%] pl-6 py-4">
+                  {item?.email ? item?.email : "N/A"}
+                </TableCell>
+                <TableCell className="text-base font-normal text-[#68706A] leading-[150%] text-center py-4">
                   {item?.firstName} {item?.lastName}
                 </TableCell>
                 <TableCell className="text-base font-normal text-[#68706A] leading-[150%] text-center py-4">
-                  {item?.email}
+                  {item?.email ? item?.email : "N/A"}
                 </TableCell>
                 <TableCell className="text-base font-normal text-[#68706A] leading-[150%] text-center py-4">
-                   {moment(item?.createdAt).format("MMM DD YYYY")}
+                  {item?.email ? item?.email : "N/A"}
+                </TableCell>
+                <TableCell className="w-[200px] text-base font-normal text-[#68706A] leading-[150%] text-center py-4 line-clamp-1">
+                  <p className="truncate">
+                    {" "}
+                    {item?.message ? item?.message : "N/A"}
+                  </p>
+                </TableCell>
+                <TableCell className="text-base font-normal text-[#68706A] leading-[150%] text-center py-4">
+                  {moment(item?.createdAt).format("MMM DD YYYY")}
                 </TableCell>
                 <TableCell className="w-[400px] text-base font-normal text-[#68706A] leading-[150%] text-center py-4">
                   {item?.status === "active" ? (
@@ -151,10 +174,10 @@ const UserManagementContainer = () => {
 
   // delete contact api
   const { mutate } = useMutation({
-    mutationKey: ["user-contact"],
+    mutationKey: ["delete-inquiry"],
     mutationFn: async (id: string) => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/${id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/inquiry/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -170,8 +193,8 @@ const UserManagementContainer = () => {
         toast.error(data?.message || "Something went wrong");
         return;
       }
-      toast.success(data?.message || "User deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["user-management"] });
+      toast.success(data?.message || "Inquiries deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["inquiry-management"] });
     },
   });
 
@@ -211,14 +234,14 @@ const UserManagementContainer = () => {
             onClose={() => setDeleteModalOpen(false)}
             onConfirm={handleDelete}
             title="Are You Sure?"
-            desc="Are you sure you want to delete this User?"
+            desc="Are you sure you want to delete this Inquiry?"
           />
         )}
 
-        {/* user view modal  */}
+        {/* inquiry view modal  */}
         <div>
           {selectViewContact && (
-            <UserManagementView
+            <InquiriesManagementView
               open={selectViewContact}
               onOpenChange={(open: boolean) => setSelectViewContact(open)}
               contactData={selectedContact}
@@ -230,4 +253,4 @@ const UserManagementContainer = () => {
   );
 };
 
-export default UserManagementContainer;
+export default InquiriesManagementContainer;
