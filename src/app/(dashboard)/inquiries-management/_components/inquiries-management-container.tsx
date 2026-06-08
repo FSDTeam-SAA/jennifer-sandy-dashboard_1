@@ -56,6 +56,8 @@ const InquiriesManagementContainer = () => {
     ? Math.ceil(data.meta.total / data.meta.limit)
     : 0;
 
+  const inquiries = data?.data ?? [];
+
   let content;
 
   if (isLoading) {
@@ -70,13 +72,13 @@ const InquiriesManagementContainer = () => {
         <ErrorContainer message={error?.message || "Something went wrong"} />
       </div>
     );
-  } else if (data && data?.data && data?.data?.length === 0) {
+  } else if (data && inquiries.length === 0) {
     content = (
       <div>
         <NotFound message="Oops! No data available. Modify your filters or check your internet connection." />
       </div>
     );
-  } else if (data && data?.data && data?.data?.length > 0) {
+  } else if (data && inquiries.length > 0) {
     content = (
       <Table className="">
         <TableHeader className="bg-[#E6F2FD] rounded-t-[12px]">
@@ -93,9 +95,9 @@ const InquiriesManagementContainer = () => {
             <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4 ">
               Property
             </TableHead>
-            <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4">
+            {/* <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4">
               Message
-            </TableHead>
+            </TableHead> */}
 
             <TableHead className="text-sm font-normal leading-[150%] text-[#343A40] text-center py-4">
               Date
@@ -109,11 +111,11 @@ const InquiriesManagementContainer = () => {
           </TableRow>
         </TableHeader>
         <TableBody className="border-b border-x border-[#E6E7E6] rounded-b-[12px]">
-          {data?.data?.map((item, index) => {
+          {inquiries.map((item, index) => {
             return (
               <TableRow key={index} className="">
                 <TableCell className="text-base font-medium text-[#68706A] leading-[150%] pl-6 py-4">
-                  {item?.email ? item?.email : "N/A"}
+                  {item?._id ? item?._id : "N/A"}
                 </TableCell>
                 <TableCell className="text-base font-normal text-[#68706A] leading-[150%] text-center py-4">
                   {item?.firstName} {item?.lastName}
@@ -122,15 +124,17 @@ const InquiriesManagementContainer = () => {
                   {item?.email ? item?.email : "N/A"}
                 </TableCell>
                 <TableCell className="text-base font-normal text-[#68706A] leading-[150%] text-center py-4">
-                  {item?.email ? item?.email : "N/A"}
+                  {item?.onOfficeId?.objekttitel
+                    ? item.onOfficeId.objekttitel
+                    : "N/A"}
                 </TableCell>
-                <TableCell className="w-[200px] text-base font-normal text-[#68706A] leading-[150%] text-center py-4 line-clamp-1">
+                {/* <TableCell className="w-[200px] text-base font-normal text-[#68706A] leading-[150%] text-center py-4 line-clamp-1">
                   <p className="truncate">
                     {" "}
                     {item?.message ? item?.message : "N/A"}
                   </p>
-                </TableCell>
-                <TableCell className="text-base font-normal text-[#68706A] leading-[150%] text-center py-4">
+                </TableCell> */}
+                <TableCell className="w-[130px] text-base font-normal text-[#68706A] leading-[150%] text-center py-4 ">
                   {moment(item?.createdAt).format("MMM DD YYYY")}
                 </TableCell>
                 <TableCell className="w-[400px] text-base font-normal text-[#68706A] leading-[150%] text-center py-4">

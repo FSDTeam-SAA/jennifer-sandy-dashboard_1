@@ -17,29 +17,55 @@ const InquiriesManagementView = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-6 space-y-4 bg-white !rounded-[12px]">
-
         <div className="space-y-4">
-             <p className="text-base font-normal text-[#6C757D)] leading-[150%]">
-            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">Inquiry ID :</strong> <br/> N/A
+          <p className="text-base font-normal text-[#6C757D] leading-[150%]">
+            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">
+              Inquiry ID :
+            </strong>
+            <br /> {contactData?._id}
           </p>
-          <p className="text-base font-normal text-[#6C757D)] leading-[150%]">
-            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">Name :</strong> <br/> {contactData?.firstName} {contactData?.lastName}
+          <p className="text-base font-normal text-[#6C757D] leading-[150%]">
+            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">
+              Name :
+            </strong>
+            <br /> {contactData?.firstName} {contactData?.lastName}
           </p>
-          <p className="text-base font-normal text-[#6C757D)] leading-[150%]">
-            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">Email :</strong> <br/> {contactData?.email}
+          <p className="text-base font-normal text-[#6C757D] leading-[150%]">
+            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">
+              Email :
+            </strong>
+            <br /> {contactData?.email}
           </p>
-          <p className="text-base font-normal text-[#6C757D)] leading-[150%]">
-            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">Phone Number :</strong> <br/> {contactData?.phoneNumber}
+          <p className="text-base font-normal text-[#6C757D] leading-[150%]">
+            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">
+              Phone Number :
+            </strong>
+            <br /> {contactData?.phoneNumber}
           </p>
-          <p className="text-base font-normal text-[#6C757D)] leading-[150%]">
-            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">Messages :</strong> <br/> {contactData?.message}
+          <p className="text-base font-normal text-[#6C757D] leading-[150%]">
+            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">
+              Property :
+            </strong>
+            <br /> {contactData?.onOfficeId?.objekttitel}
           </p>
-          <p className="text-base font-normal text-[#6C757D)] leading-[150%]">
-            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">Status :</strong> <br/> {contactData?.status}
+          <p className="text-base font-normal text-[#6C757D] leading-[150%]">
+            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">
+              Messages :
+            </strong>
+            <br /> {contactData?.message}
           </p>
-           <p className="text-base font-normal text-[#7D7D7D] leading-[150%]">
-                      <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">Joined Date :</strong> <br/> {moment(contactData?.createdAt).format("MMM DD, YYYY")}
-                    </p>
+          <p className="text-base font-normal text-[#6C757D] leading-[150%]">
+            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">
+              Status :
+            </strong>
+            <br /> {contactData?.status}
+          </p>
+          <p className="text-base font-normal text-[#7D7D7D] leading-[150%]">
+            <strong className="text-base font-semibold text-[#1E1E1E] leading-[150%]">
+              Joined Date :
+            </strong>
+            <br /> {moment(contactData?.createdAt).format("MMM DD, YYYY")}
+          </p>
         </div>
       </DialogContent>
     </Dialog>
@@ -47,4 +73,3 @@ const InquiriesManagementView = ({
 };
 
 export default InquiriesManagementView;
-
