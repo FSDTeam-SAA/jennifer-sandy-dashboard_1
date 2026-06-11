@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState, type DragEvent, type FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { CloudUpload, Plus } from "lucide-react";
+import { CloudUpload, Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +18,7 @@ type BlogFormMode = "add" | "edit";
 
 type BlogFormProps = {
   mode: BlogFormMode;
+  blogId?: string;
   initialTitle?: string;
   initialDescription?: string;
   initialImage?: string | null;
@@ -32,11 +35,15 @@ const isHtmlContentEmpty = (html: string) => {
 
 const BlogForm = ({
   mode,
+  blogId,
   initialTitle = "",
   initialDescription = "",
   initialImage = null,
 }: BlogFormProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const session = useSession();
+  const token = (session?.data?.user as { accessToken: string })?.accessToken;
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [coverPreview, setCoverPreview] = useState<string | null>(initialImage);
@@ -76,6 +83,64 @@ const BlogForm = ({
     updateCoverPreview(file);
   };
 
+  const { mutate: createBlog, isPending: isCreating } = useMutation({
+    mutationKey: ["create-blog"],
+    mutationFn: async (formData: FormData) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/blog`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+      return res.json();
+    },
+    onSuccess: (response) => {
+      if (!response?.success) {
+        toast.error(response?.message || "Something went wrong");
+        return;
+      }
+      toast.success(response?.message || "Blog created successfully");
+      queryClient.invalidateQueries({ queryKey: ["blog-management"] });
+      router.push("/blog-management");
+    },
+    onError: () => {
+      toast.error("Failed to create blog");
+    },
+  });
+
+  const { mutate: updateBlog, isPending: isUpdating } = useMutation({
+    mutationKey: ["update-blog", blogId],
+    mutationFn: async (formData: FormData) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/blog/${blogId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+      return res.json();
+    },
+    onSuccess: (response) => {
+      if (!response?.success) {
+        toast.error(response?.message || "Something went wrong");
+        return;
+      }
+      toast.success(response?.message || "Blog updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["blog-management"] });
+      router.push("/blog-management");
+    },
+    onError: () => {
+      toast.error("Failed to update blog");
+    },
+  });
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -89,18 +154,19 @@ const BlogForm = ({
       return;
     }
 
-    toast.success(
-      mode === "add"
-        ? "Blog draft is ready for API integration."
-        : "Blog changes are ready for API integration.",
-    );
+    const formData = new FormData();
+    formData.append("title", title.trim());
+    formData.append("description", description);
 
-    console.log("Blog form payload", {
-      mode,
-      title,
-      description,
-      coverFile,
-    });
+    if (coverFile) {
+      formData.append("thembnail", coverFile);
+    }
+
+    if (mode === "add") {
+      createBlog(formData);
+    } else {
+      updateBlog(formData);
+    }
   };
 
   const handleCancel = () => {
@@ -113,6 +179,8 @@ const BlogForm = ({
     const file = event.dataTransfer.files?.[0];
     handleFileSelect(file);
   };
+
+  const isSubmitting = isCreating || isUpdating;
 
   return (
     <form onSubmit={handleSubmit} className="p-6">
@@ -163,7 +231,23 @@ const BlogForm = ({
               onDrop={handleDrop}
             >
               {coverPreview ? (
-                <div className="relative h-[260px] w-full overflow-hidden rounded-[8px]">
+                <div className="relative h-[260px] w-full overflow-hidden rounded-[8px] group">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (previewUrlRef.current) {
+                        URL.revokeObjectURL(previewUrlRef.current);
+                        previewUrlRef.current = null;
+                      }
+                      setCoverPreview(null);
+                      setCoverFile(null);
+                    }}
+                    className="absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
+                    aria-label="Remove image"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
                   <Image
                     src={coverPreview}
                     alt="Blog preview"
@@ -199,15 +283,24 @@ const BlogForm = ({
               type="button"
               onClick={handleCancel}
               variant="outline"
+              disabled={isSubmitting}
               className="h-10 rounded-[8px] border-[#FF5A5F] text-sm font-medium text-[#FF5A5F] hover:bg-[#FFF5F5] hover:text-[#FF5A5F]"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="h-10 rounded-[8px] bg-primary text-sm font-medium text-white hover:bg-primary/90"
+              disabled={isSubmitting}
+              className="h-10 rounded-[8px] bg-primary text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-70"
             >
-              Save
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {mode === "add" ? "Creating..." : "Updating..."}
+                </>
+              ) : (
+                "Save"
+              )}
             </Button>
           </div>
         </div>
