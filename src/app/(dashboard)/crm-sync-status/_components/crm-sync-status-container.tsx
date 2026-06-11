@@ -201,9 +201,6 @@ const CrmSyncStatusContainer = () => {
                     Errors
                   </th>
                   <th className="py-4 text-center text-sm font-normal leading-[150%] text-[#343A40]">
-                    Details
-                  </th>
-                  <th className="py-4 text-center text-sm font-normal leading-[150%] text-[#343A40]">
                     Status
                   </th>
                   <th className="py-4 text-center text-sm font-normal leading-[150%] text-[#343A40]">
@@ -243,15 +240,6 @@ const CrmSyncStatusContainer = () => {
                     </td>
                     <td className="py-4 text-center text-base font-normal leading-[150%] text-[#68706A]">
                       {item.errors}
-                    </td>
-                    <td className="py-4 text-center text-base font-normal leading-[150%] text-[#68706A]">
-                      <button
-                        type="button"
-                        onClick={() => handleViewDetails(item)}
-                        className="font-normal text-[#68706A] underline underline-offset-2 hover:text-[#343A40]"
-                      >
-                        See Details
-                      </button>
                     </td>
                     <td className="py-4 text-center align-middle">
                       <span
