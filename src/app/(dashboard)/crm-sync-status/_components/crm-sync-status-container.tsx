@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Eye, RefreshCcw, Trash2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 
 import ClaudePagination from "@/components/ui/claude-pagination";
@@ -13,6 +14,19 @@ import { cn } from "@/lib/utils";
 import crmImage from "../../../../../public/assets/images/crm.jpg"
 
 import type { CrmSyncStatusItem } from "./crm-sync-data-type";
+
+interface CrmSyncResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  data: {
+    total: number;
+    synced: number;
+    errors: number;
+    deactivated: number;
+    syncedAt: string;
+  };
+}
 
 const itemsPerPage = 5;
 
@@ -69,7 +83,23 @@ const mockCrmSyncItems: CrmSyncStatusItem[] = Array.from(
   }),
 );
 
+const formatSyncDate = (syncedAt: string): string => {
+  const date = new Date(syncedAt);
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  };
+  return date.toLocaleDateString("en-US", options);
+};
+
 const CrmSyncStatusContainer = () => {
+  const { data: session } = useSession();
+  const token = (session?.user as { accessToken?: string })?.accessToken;
+
   const [currentPage, setCurrentPage] = useState(1);
   const [syncItems, setSyncItems] = useState(mockCrmSyncItems);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -77,6 +107,41 @@ const CrmSyncStatusContainer = () => {
   const [selectedItem, setSelectedItem] = useState<CrmSyncStatusItem | null>(
     null,
   );
+  const [isConnected, setIsConnected] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState("—");
+  const [totalSynced, setTotalSynced] = useState(0);
+
+  const fetchSyncStatus = useCallback(async () => {
+    if (!token) return;
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/crm/sync/onoffice`,
+        {
+          method: "POST",
+          headers: {
+            accept: "*/*",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const response: CrmSyncResponse = await res.json();
+
+      setIsConnected(response.success);
+      if (response.success && response.data) {
+        setLastSyncTime(formatSyncDate(response.data.syncedAt));
+        setTotalSynced(response.data.total);
+      }
+    } catch (error) {
+      console.error("CRM sync status fetch error:", error);
+      setIsConnected(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchSyncStatus();
+  }, [fetchSyncStatus]);
 
   const totalPages = Math.max(1, Math.ceil(syncItems.length / itemsPerPage));
 
@@ -129,9 +194,14 @@ const CrmSyncStatusContainer = () => {
               Connection Status
             </p>
             <div className="mt-2 flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#1FAF38]" />
+              <span
+                className={cn(
+                  "h-2 w-2 rounded-full",
+                  isConnected ? "bg-[#1FAF38]" : "bg-[#FF3B30]",
+                )}
+              />
               <span className="text-base font-medium leading-[150%] text-[#343A40]">
-                Connected
+                {isConnected ? "Connected" : "Disconnected"}
               </span>
             </div>
           </div>
@@ -141,7 +211,7 @@ const CrmSyncStatusContainer = () => {
               Last Sync Time
             </p>
             <p className="mt-2 text-base font-semibold leading-[150%] text-[#343A40]">
-              March 3, 2026 09:30 AM
+              {lastSyncTime}
             </p>
           </div>
 
@@ -150,7 +220,7 @@ const CrmSyncStatusContainer = () => {
               Total Synced Properties
             </p>
             <p className="mt-2 text-base font-semibold leading-[150%] text-[#343A40]">
-              248
+              {totalSynced}
             </p>
           </div>
         </div>
