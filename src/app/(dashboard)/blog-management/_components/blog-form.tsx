@@ -39,16 +39,6 @@ const isHtmlContentEmpty = (html: string) => {
   return textContent.length === 0 && !/<img\b/i.test(html);
 };
 
-const CATEGORIES = [
-  "Living",
-  "Guide",
-  "Tips",
-  "News",
-  "Expat",
-  "Real Estate",
-  "General",
-];
-
 const BlogForm = ({
   mode,
   blogId,
@@ -73,7 +63,7 @@ const BlogForm = ({
   const [tags, setTags] = useState<string[]>(initialTags);
   const [tagInput, setTagInput] = useState("");
   const [author, setAuthor] = useState(initialAuthor);
-  const [isPublished, setIsPublished] = useState(initialIsPublished);
+  const [isPublished] = useState(initialIsPublished);
   const [publishedAt, setPublishedAt] = useState(initialPublishedAt);
   const [coverPreview, setCoverPreview] = useState<string | null>(initialImage);
   const [coverFile, setCoverFile] = useState<File | null>(null);
@@ -297,18 +287,12 @@ const BlogForm = ({
             <label className="mb-2 block text-sm font-medium text-[#343A40]">
               Category
             </label>
-            <select
+            <Input
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="h-10 w-full rounded-[6px] border border-[#D9D9D9] bg-white px-3 text-sm text-[#343A40] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-            >
-              <option value="">Select a category</option>
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+              placeholder="Write category name"
+              className="h-10 rounded-[6px] border-[#D9D9D9] text-sm text-[#343A40] placeholder:text-[#9CA3AF] focus:border-primary focus:ring-1 focus:ring-primary"
+            />
           </div>
 
           {/* Tags */}
@@ -449,21 +433,6 @@ const BlogForm = ({
               onChange={(event) => setPublishedAt(event.target.value)}
               className="h-10 rounded-[6px] border-[#D9D9D9] text-sm text-[#343A40] focus:border-primary focus:ring-1 focus:ring-primary"
             />
-          </div>
-
-          {/* Published Status */}
-          <div className="rounded-[8px] border border-[#D9D9D9] bg-white p-4">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isPublished}
-                onChange={(event) => setIsPublished(event.target.checked)}
-                className="h-4 w-4 rounded border-[#D9D9D9] text-primary focus:ring-primary"
-              />
-              <span className="text-sm font-medium text-[#343A40]">
-                Published
-              </span>
-            </label>
           </div>
 
           {/* Action Buttons */}

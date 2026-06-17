@@ -151,9 +151,6 @@ const BlogContainer = () => {
               <TableHead className="w-[10%] py-4 text-center text-sm font-normal leading-[150%] text-[#343A40]">
                 Category
               </TableHead>
-              <TableHead className="w-[10%] py-4 text-center text-sm font-normal leading-[150%] text-[#343A40]">
-                Status
-              </TableHead>
               <TableHead className="w-[13%] py-4 text-center text-sm font-normal leading-[150%] text-[#343A40]">
                 Created On
               </TableHead>
@@ -193,18 +190,6 @@ const BlogContainer = () => {
                       {blog.category}
                     </span>
                   ) : "—"}
-                </TableCell>
-                <TableCell className={cn("py-3 text-center align-middle", index !== blogs.length - 1 && "border-b border-[#E6E7E6]")}>
-                  <span
-                    className={cn(
-                      "inline-flex min-w-[72px] justify-center rounded-[4px] px-3 py-1.5 text-xs font-medium leading-[150%]",
-                      blog.isPublished
-                        ? "bg-[#E6F2FD] text-primary"
-                        : "bg-[#FEF8E6] text-[#DEA400]"
-                    )}
-                  >
-                    {blog.isPublished ? "Published" : "Draft"}
-                  </span>
                 </TableCell>
                 <TableCell className={cn("py-3 text-center align-middle text-base font-normal leading-[150%] text-[#68706A]", index !== blogs.length - 1 && "border-b border-[#E6E7E6]")}>
                   {moment(blog.createdAt).format("YYYY-MM-DD")}
