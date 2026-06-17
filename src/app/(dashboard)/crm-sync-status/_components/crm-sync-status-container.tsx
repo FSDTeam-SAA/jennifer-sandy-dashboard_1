@@ -108,10 +108,12 @@ const CrmSyncStatusContainer = () => {
   const [lastSyncTime, setLastSyncTime] = useState("—");
   const [totalSynced, setTotalSynced] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isLoadingSyncStatus, setIsLoadingSyncStatus] = useState(true);
 
   const fetchSyncStatus = useCallback(async () => {
     if (!token) return;
 
+    setIsLoadingSyncStatus(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/crm/sync/onoffice`,
@@ -134,6 +136,8 @@ const CrmSyncStatusContainer = () => {
     } catch (error) {
       console.error("CRM sync status fetch error:", error);
       setIsConnected(false);
+    } finally {
+      setIsLoadingSyncStatus(false);
     }
   }, [token]);
 
@@ -196,6 +200,8 @@ const CrmSyncStatusContainer = () => {
   const handleConfirmSync = async () => {
     setSyncModalOpen(false);
     setIsSyncing(true);
+    setIsLoadingSyncStatus(true);
+    setIsLoadingEstates(true);
 
     try {
       const res = await fetch(
@@ -209,19 +215,28 @@ const CrmSyncStatusContainer = () => {
         }
       );
 
-      const response = await res.json();
+      const response: CrmSyncResponse = await res.json();
 
       if (response?.success) {
+        // Update stat cards immediately from sync response
+        setIsConnected(true);
+        if (response.data) {
+          setLastSyncTime(formatSyncDate(response.data.syncedAt));
+          setTotalSynced(response.data.total);
+        }
         toast.success("CRM sync completed successfully.");
-        // Refresh status and estates after sync
-        fetchSyncStatus();
-        fetchEstates();
+        // Refresh data in background to ensure everything is up-to-date
+        await Promise.all([fetchSyncStatus(), fetchEstates()]);
       } else {
         toast.error(response?.message || "CRM sync failed.");
+        setIsLoadingSyncStatus(false);
+        setIsLoadingEstates(false);
       }
     } catch (error) {
       console.error("CRM sync error:", error);
       toast.error("CRM sync failed. Please try again.");
+      setIsLoadingSyncStatus(false);
+      setIsLoadingEstates(false);
     } finally {
       setIsSyncing(false);
     }
@@ -253,15 +268,24 @@ const CrmSyncStatusContainer = () => {
               Connection Status
             </p>
             <div className="mt-2 flex items-center gap-2">
-              <span
-                className={cn(
-                  "h-2 w-2 rounded-full",
-                  isConnected ? "bg-[#1FAF38]" : "bg-[#FF3B30]",
-                )}
-              />
-              <span className="text-base font-medium leading-[150%] text-[#343A40]">
-                {isConnected ? "Connected" : "Disconnected"}
-              </span>
+              {isLoadingSyncStatus ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-[#D9D9D9]" />
+                  <div className="h-5 w-24 animate-pulse rounded-[4px] bg-[#E6E6E8]" />
+                </div>
+              ) : (
+                <>
+                  <span
+                    className={cn(
+                      "h-2 w-2 rounded-full",
+                      isConnected ? "bg-[#1FAF38]" : "bg-[#FF3B30]",
+                    )}
+                  />
+                  <span className="text-base font-medium leading-[150%] text-[#343A40]">
+                    {isConnected ? "Connected" : "Disconnected"}
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
@@ -269,18 +293,26 @@ const CrmSyncStatusContainer = () => {
             <p className="text-sm font-normal leading-[150%] text-[#68706A]">
               Last Sync Time
             </p>
-            <p className="mt-2 text-base font-semibold leading-[150%] text-[#343A40]">
-              {lastSyncTime}
-            </p>
+            {isLoadingSyncStatus ? (
+              <div className="mt-2 h-6 w-44 animate-pulse rounded-[4px] bg-[#E6E6E8]" />
+            ) : (
+              <p className="mt-2 text-base font-semibold leading-[150%] text-[#343A40]">
+                {lastSyncTime}
+              </p>
+            )}
           </div>
 
           <div>
             <p className="text-sm font-normal leading-[150%] text-[#68706A]">
               Total Synced Properties
             </p>
-            <p className="mt-2 text-base font-semibold leading-[150%] text-[#343A40]">
-              {totalSynced}
-            </p>
+            {isLoadingSyncStatus ? (
+              <div className="mt-2 h-6 w-28 animate-pulse rounded-[4px] bg-[#E6E6E8]" />
+            ) : (
+              <p className="mt-2 text-base font-semibold leading-[150%] text-[#343A40]">
+                {totalSynced}
+              </p>
+            )}
           </div>
         </div>
 
@@ -288,10 +320,10 @@ const CrmSyncStatusContainer = () => {
           <button
             type="button"
             onClick={handleSyncNow}
-            disabled={isSyncing}
+            disabled={isSyncing || isLoadingEstates}
             className="inline-flex h-9 items-center gap-2 rounded-[8px] bg-primary px-4 text-sm font-medium leading-[150%] text-white transition-colors hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            <RefreshCcw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
+            <RefreshCcw className={cn("h-4 w-4", (isSyncing || isLoadingEstates) && "animate-spin")} />
             {isSyncing ? "Syncing..." : "Sync Now"}
           </button>
         </div>
