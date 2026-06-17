@@ -107,6 +107,7 @@ const CrmSyncStatusContainer = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState("—");
   const [totalSynced, setTotalSynced] = useState(0);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const fetchSyncStatus = useCallback(async () => {
     if (!token) return;
@@ -187,12 +188,43 @@ const CrmSyncStatusContainer = () => {
   const showingEnd = Math.min(currentPage * itemsPerPage, syncItems.length);
 
   const handleSyncNow = () => {
-    setSyncModalOpen(true);
+    if (!isSyncing) {
+      setSyncModalOpen(true);
+    }
   };
 
-  const handleConfirmSync = () => {
+  const handleConfirmSync = async () => {
     setSyncModalOpen(false);
-    toast.success("CRM sync started.");
+    setIsSyncing(true);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/crm/sync/onoffice`,
+        {
+          method: "POST",
+          headers: {
+            accept: "*/*",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const response = await res.json();
+
+      if (response?.success) {
+        toast.success("CRM sync completed successfully.");
+        // Refresh status and estates after sync
+        fetchSyncStatus();
+        fetchEstates();
+      } else {
+        toast.error(response?.message || "CRM sync failed.");
+      }
+    } catch (error) {
+      console.error("CRM sync error:", error);
+      toast.error("CRM sync failed. Please try again.");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleViewDetails = (item: CrmSyncStatusItem) => {
@@ -256,10 +288,11 @@ const CrmSyncStatusContainer = () => {
           <button
             type="button"
             onClick={handleSyncNow}
-            className="inline-flex h-9 items-center gap-2 rounded-[8px] bg-primary px-4 text-sm font-medium leading-[150%] text-white transition-colors hover:bg-primary/90"
+            disabled={isSyncing}
+            className="inline-flex h-9 items-center gap-2 rounded-[8px] bg-primary px-4 text-sm font-medium leading-[150%] text-white transition-colors hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            <RefreshCcw className="h-4 w-4" />
-            Sync Now
+            <RefreshCcw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
+            {isSyncing ? "Syncing..." : "Sync Now"}
           </button>
         </div>
       </div>
@@ -328,7 +361,7 @@ const CrmSyncStatusContainer = () => {
                       <td className="w-2/5 py-4 pl-6 align-middle">
                         <div className=" flex items-center gap-3">
                           {item.thumbnail ? (
-                            <img
+                            <Image
                               src={item.thumbnail}
                               alt={item.apartmentName}
                               width={40}
